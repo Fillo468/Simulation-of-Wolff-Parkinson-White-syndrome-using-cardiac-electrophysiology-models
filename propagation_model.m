@@ -1,7 +1,6 @@
-%In media, il cuore di un adulto ha una lunghezza di circa 12 cm, una larghezza di 8 cm
 Htot=12; %cm
-Lx=8; %uso la stessa larghezza sia per atri che ventricoli
-H_A=4; %prendo 1/3 della lunghezza totale del cuore come atri
+Lx=8; 
+H_A=4; 
 H_V=8;
 dx=0.1; 
 
@@ -19,7 +18,7 @@ AVN=floor(N_x/2);
 L_y_AVN=0.03*Htot;
 N_AVN=round(L_y_AVN/dx)+1;
 
-%definisco la zona del SAN
+%SAN
 SAN_x=0.25*Lx;
 dim_x_SAN= 0.005*Lx; 
 SAN_y= 0.02*H_A;
@@ -28,43 +27,40 @@ SAN_index= round(SAN_x/dx)+1;
 SAN_index_y=round (SAN_y/dx)+1;
 lunghezza_san=round (dim_x_SAN/dx)+1;
 
-%definisco i vari tipi di miociti cardiaci
 L_epi_x=0.36*spessore_ventricoli;
 N_epi=round(L_epi_x/dx);
 
-L_mid=0.28*spessore_ventricoli;   %percentuali prese dalle esercitazioni
+L_mid=0.28*spessore_ventricoli;   
 N_mid=round(L_mid/dx);
 
-%definisco la zona del fascio di Kent
+%Kent
 KENT_x=0.96*Lx;
 dim_KENT= 0.009*Lx; 
 
 KENT_index= round(KENT_x/dx)+1;
 N_L_KENT=round(dim_KENT/dx)+1;
 
-% matrice per definire la geometria 
+% geometry matrix
 Cuore= ones(N_Htot,N_x)*100;
 
-%setto
 Cuore(1:N_y_A,AVN-N_atri/2:AVN+N_atri/2)=30;
 Cuore(N_y_A:N_Htot,AVN-N_atri/2:AVN+N_atri/2)=40;
 
-%tessuto endo 
+%endo 
 Cuore(N_y_A:N_Htot,1:N_ventricoli)=40;
 Cuore(N_Htot-N_ventricoli:N_Htot,:)=40;
 Cuore(N_y_A:N_Htot,N_x-N_ventricoli:N_x)=40;
 
-%tessuto mid
+%mid
 Cuore(N_y_A:N_Htot,1:N_mid+N_epi)=50;
 Cuore(N_y_A:N_Htot,N_x-N_mid-N_epi:N_x)=50;
 Cuore(N_Htot-N_mid-N_epi:N_Htot,:)=50;
 
-%tessuto epi
+%epi
 Cuore(N_y_A:N_Htot,1:N_epi)=65;
 Cuore(N_y_A:N_Htot,N_x-N_epi:N_x)=65;
 Cuore(N_Htot-N_epi:N_Htot,:)=65;
 
-%atrio
 Cuore(1:N_atri,:)=30;
 Cuore(1:N_y_A,1:N_atri)=30;
 Cuore(1:N_y_A,N_x-N_atri:N_x)=30;
@@ -76,14 +72,13 @@ Cuore(SAN_index_y:SAN_index_y+lunghezza_san,SAN_index:SAN_index+lunghezza_san)=8
 Cuore(N_y_A-N_AVN:N_AVN+N_y_A,:)=100;
 Cuore(N_y_A-N_AVN:N_AVN+N_y_A,AVN-N_atri/2:AVN+N_atri/2)=1;
 
-%fascio di Kent
+%Kent
 Cuore(N_y_A-N_AVN:N_y_A+N_AVN,KENT_index:N_L_KENT+KENT_index)=16;
 
 figure
 imagesc(Cuore);
 colormap(hot); 
 colorbar;
-title('Rappresentazione cuore');
 axis equal
 axis ij
 cb=colorbar;
@@ -111,7 +106,7 @@ Nt=round(T/dt)+1;
 Vm=-85*ones(Nt,N_x,N_Htot); %mV
 u = zeros(Nt, N_x, N_Htot);
 
-%condizione iniziale SAN
+%SAN
 Vm(1,SAN_index:SAN_index+lunghezza_san,SAN_index_y:SAN_index_y+lunghezza_san)=-65; %mV
 
 for i=1:Nt-1
@@ -122,7 +117,6 @@ for i=1:Nt-1
 
                 dm=Dm;
 
-                %scelgo i parametri a seconda del tessuto
                 if Cuore(jy,jx)==30  
                     dm=Dm_A;
                     e=e_atrio;
@@ -141,8 +135,8 @@ for i=1:Nt-1
                     e=e_epi;
                 end
 
-                %calcolo del Laplaciano utilizzando 
-                %il metodo dei punti fantasma 
+                %Laplacian
+                 
                 if jx > 1 && Cuore(jy, jx-1) ~= 100 
                     sx = Vm(i, jx-1, jy);
                 else
@@ -174,7 +168,6 @@ for i=1:Nt-1
                 lapv=lapvx+lapvy;
                 Im=dm*lapv;    
                 
-                %termine per la eterogeneità della diffusività
                 if Cuore(jy,jx)==30 & Cuore(jy+1,jx)==1;
                     Im=Im+((Dm_AVN-Dm_A)/dx)*((Vm(i,jx,jy+1)-Vm(i,jx,jy))/dx);
                 end
@@ -199,7 +192,7 @@ for i=1:Nt-1
                     Im=Im+((Dm-Dm_endo)/dx)*((Vm(i,jx+1,jy)-Vm(i,jx,jy))/dx);
                 end
 
-                %corrente ionica Rogers-McCulloch
+                %Rogers-McCulloch
                 if Cuore(jy,jx)~=80  
                 c1=2.6;
                 c2=1;
@@ -213,7 +206,7 @@ for i=1:Nt-1
                 Ii=c1*vr*(a-vm)*(1-vm)+c2*u(i,jx,jy)*vr;
                 dv2dt=Im-Ii;
 
-                %SAN FitzHugh-Nagumo con (0;0) instabile
+                %SAN FitzHugh-Nagumo
                 elseif Cuore(jy,jx)==80 
                     c1=1.56;
                     c2=0.6;
@@ -245,7 +238,7 @@ for i=1:Nt-1
     end
 end
 
-%Potenziale di azione del punto (1;1)
+
 figure;
 plot(0:dt:T, squeeze(Vm(:, 1, 1)), 'LineWidth', 1.5);
 xlabel('Tempo [ms]');
@@ -264,12 +257,12 @@ y=(0:dx:Htot);
 x0 = round(N_x / 2);
 y0 = round(N_Htot / 2);
 
-%versori delle tre derivazioni
+
 Rl_base=R*[cosd(30);cosd(60)]; 
 Rr_base=R*[-cosd(30);cosd(60)];
 Rf_base=R*[0;-1];
 
-%rotazione
+%rotation matrix
 theta = deg2rad(-45);
 Rmat = [cos(theta), -sin(theta); -sin(theta), -cos(theta)];
 
@@ -342,10 +335,6 @@ end
 
 mag=20;
 
-% v=VideoWriter('Progettino_propagazione.mp4','MPEG-4');
-% v.Quality=90;
-% v.FrameRate=30;
-% open(v);
 
 figure;
 for i = 1:10:Nt  
@@ -359,12 +348,10 @@ for i = 1:10:Nt
     quiver(x0,y0,Pb(i,1),Pb(i,2),mag,'k','Linewidth',2);
     drawnow;
     hold off
-    % frame=getframe(gcf);
-    % writeVideo(v,frame)
+   
 end
-% close(v)
 
-%calcolo ECG
+%ECG
 ECG1=VLL-VRR;
 ECG2=VFF-VRR;
 ECG3=VFF-VLL;
