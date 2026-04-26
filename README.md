@@ -22,14 +22,23 @@ The model reproduces the electrical propagation in cardiac tissue and investigat
 
 ### Geometry
 
-* 2D representation of cardiac tissue
-* Separation between atrial and ventricular regions
-* Inclusion of:
+The simulation is based on a 2D representation of the heart, where different regions are characterized by specific electrophysiological properties:
+
+Atrial Tissue: Modeled with specific conductivity and recovery parameters to simulate atrial depolarization.
+
+Ventricular Tissue: To reproduce the physiological transmural heterogeneity, the ventricular wall (with a thickness of 1 cm) is divided into three distinct layers:
+ * Epicardium: The outermost layer (36% of the wall thickness).
+ * Mid-myocardium: The intermediate layer.
+ * Endocardium: The innermost layer (36% of the wall thickness), characterized by faster conduction.
+
+Inclusion of:
 
   * Sinoatrial node (SAN)
   * Atrioventricular node (AVN)
   * Insulating boundary between atria and ventricles
 * Configurable accessory pathways (Bundle of Kent)
+
+![Rappresentation](results/rappresentation.png)
 
 ---
 
@@ -94,9 +103,6 @@ Study of conduction patterns with multiple Kent bundles.
 ## How to Run
 
 Each simulation is independent.
-
-1. Open MATLAB
-2. Navigate to the `code/` folder
 
 Run one of the following scripts:
 
