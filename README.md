@@ -91,22 +91,6 @@ Study of conduction patterns with multiple Kent bundles.
 
 ---
 
-## Project Structure
-
-project-root/
-│
-├── code/
-│   ├── propagation_simulation.m
-│   ├── avrt_simulation.m
-│   └── multiple_kent_paths.m
-│
-├── results/
-├── presentation/
-├── README.md
-└── LICENSE
-
----
-
 ## How to Run
 
 Each simulation is independent.
@@ -116,7 +100,7 @@ Each simulation is independent.
 
 Run one of the following scripts:
 
-* `propagation_simulation.m` → normal propagation
+* `propagation_simulation.m` → normal propagation, with ECG approximation
 * `avrt_simulation.m` → reentrant tachycardia
 * `multiple_kent_paths.m` → multiple accessory pathways
 
@@ -138,9 +122,7 @@ Each script can be modified to explore different parameters such as:
 ## Future Improvements
 
 * More realistic cardiac geometry
-* Improved ECG modeling
 * Extension to 3D simulations
-* Parameter calibration with physiological data
 
 ---
 
