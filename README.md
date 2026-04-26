@@ -88,15 +88,15 @@ Study of conduction patterns with multiple Kent bundles.
 
 ### Propagation
 
-![Propagation](results/Propagation.gif)
+![Propagation](Results/Propagation.gif)
 
 ### AVRT
 
-![AVRT](results/avrt_simulation.gif)
+![AVRT](Results/avrt_simulation.gif)
 
 ### Multiple Pathways
 
-![Multiple KENT](results/multiple_KENT.gif)
+![Multiple KENT](Results/multiple_KENT.gif)
 
 ---
 
