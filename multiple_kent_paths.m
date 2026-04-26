@@ -26,38 +26,35 @@ SAN_index= round(SAN_x/dx)+1;
 SAN_index_y=round (SAN_y/dx)+1;
 lunghezza_san=round (dim_x_SAN/dx)+1;
 
-%definisco i vari tipi di miociti cardiaci
 L_epi_x=0.36*spessore_ventricoli;
 N_epi=round(L_epi_x/dx);
 
 L_mid=0.28*spessore_ventricoli;   
 N_mid=round(L_mid/dx);
 
-%Kent indici
+%Kent index
 KENT_x=0.96*Lx;
 dim_KENT= 0.009*Lx; 
 
 KENT_index= round(KENT_x/dx)+1;
 N_L_KENT=round(dim_KENT/dx)+1;
 
-%matrice per definire la geometria
 Cuore= ones(N_Htot,N_x)*100;
 
-%setto
 Cuore(1:N_y_A,AVN-N_atri/2:AVN+N_atri/2)=30;
 Cuore(N_y_A:N_Htot,AVN-N_atri/2:AVN+N_atri/2)=40;
 
-%tessuto endo 
+%endo 
 Cuore(N_y_A:N_Htot,1:N_ventricoli)=40;
 Cuore(N_Htot-N_ventricoli:N_Htot,:)=40;
 Cuore(N_y_A:N_Htot,N_x-N_ventricoli:N_x)=40;
 
-%tessuto mid
+%mid
 Cuore(N_y_A:N_Htot,1:N_mid+N_epi)=50;
 Cuore(N_y_A:N_Htot,N_x-N_mid-N_epi:N_x)=50;
 Cuore(N_Htot-N_mid-N_epi:N_Htot,:)=50;
 
-%tessuto epi
+%epi
 Cuore(N_y_A:N_Htot,1:N_epi)=65;
 Cuore(N_y_A:N_Htot,N_x-N_epi:N_x)=65;
 Cuore(N_Htot-N_epi:N_Htot,:)=65;
@@ -74,7 +71,7 @@ Cuore(SAN_index_y:SAN_index_y+lunghezza_san,SAN_index:SAN_index+lunghezza_san)=8
 Cuore(N_y_A-N_AVN:N_AVN+N_y_A,:)=100;
 Cuore(N_y_A-N_AVN:N_AVN+N_y_A,AVN-N_atri/2:AVN+N_atri/2)=1;
 
-% fasci di Kent multipli 
+% multiple KENT 
 Cuore(N_y_A-N_AVN:N_y_A+N_AVN,KENT_index:N_L_KENT+KENT_index)=16;
 Cuore(N_y_A-N_AVN:N_y_A+N_AVN,1:N_L_KENT)=16;
 
@@ -82,7 +79,6 @@ figure
 imagesc(Cuore);
 colormap(hot); 
 colorbar;
-title('Rappresentazione cuore');
 axis equal
 axis ij
 cb=colorbar;
@@ -110,7 +106,7 @@ Nt=round(T/dt)+1;
 Vm=-85*ones(Nt,N_x,N_Htot); %mV
 u = zeros(Nt, N_x, N_Htot);
 
-%condizione iniziale SAN
+%SAN
 Vm(1,SAN_index:SAN_index+lunghezza_san,SAN_index_y:SAN_index_y+lunghezza_san)=-65; %mV
 
 for i=1:Nt-1
@@ -139,7 +135,7 @@ for i=1:Nt-1
                     e=e_epi;
                 end
 
-                %Laplaciano con metodo dei punti fantasma
+                %Laplacian
                 if jx > 1 && Cuore(jy, jx-1) ~= 100 
                     sx = Vm(i, jx-1, jy);
                 else
@@ -171,7 +167,6 @@ for i=1:Nt-1
                 lapv=lapvx+lapvy;
                 Im=dm*lapv;    
                 
-                %termine per la eterogeneità della diffusività
                 if Cuore(jy,jx)==30 & Cuore(jy+1,jx)==1;
                     Im=Im+((Dm_AVN-Dm_A)/dx)*((Vm(i,jx,jy+1)-Vm(i,jx,jy))/dx);
                 end
@@ -196,7 +191,7 @@ for i=1:Nt-1
                     Im=Im+((Dm-Dm_endo)/dx)*((Vm(i,jx+1,jy)-Vm(i,jx,jy))/dx);
                 end
                  
-                %corrente ionica Rogers-McCulloch
+                %Rogers-McCulloch
                 if Cuore(jy,jx)~=80  
 
                 c1=2.6;
@@ -244,10 +239,7 @@ for i=1:Nt-1
     end
 end
 
-% v=VideoWriter('Progettino_Kent_multipli.mp4','MPEG-4');
-% v.Quality=90;
-% v.FrameRate=30;
-% open(v);
+
 
 figure;
 for i = 1:10:Nt  
@@ -258,8 +250,6 @@ for i = 1:10:Nt
     title(sprintf('Potenziale Vm a t = %.1f ms', (i-1)*dt));
     axis equal ij
     drawnow;
-    % frame=getframe(gcf);
-    % writeVideo(v,frame)
+
 end
-% close(v)
 
