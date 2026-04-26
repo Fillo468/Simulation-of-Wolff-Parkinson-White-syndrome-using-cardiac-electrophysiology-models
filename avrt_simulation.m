@@ -26,7 +26,6 @@ SAN_index= round(SAN_x/dx)+1;
 SAN_index_y=round (SAN_y/dx)+1;
 lunghezza_san=round (dim_x_SAN/dx)+1;
 
-%definisco i vari tipi di miociti cardiaci
 L_epi_x=0.36*spessore_ventricoli;
 N_epi=round(L_epi_x/dx);
 
@@ -40,24 +39,24 @@ dim_KENT= 0.009*Lx;
 KENT_index= round(KENT_x/dx)+1;
 N_L_KENT=round(dim_KENT/dx)+1;
 
-%matrice per definire la geometria
+% geometry
 Cuore= ones(N_Htot,N_x)*100;
 
 %setto
 Cuore(1:N_y_A,AVN-N_atri/2:AVN+N_atri/2)=30;
 Cuore(N_y_A:N_Htot,AVN-N_atri/2:AVN+N_atri/2)=40;
 
-%tessuto endo 
+%endo 
 Cuore(N_y_A:N_Htot,1:N_ventricoli)=40;
 Cuore(N_Htot-N_ventricoli:N_Htot,:)=40;
 Cuore(N_y_A:N_Htot,N_x-N_ventricoli:N_x)=40;
 
-%tessuto mid
+%mid
 Cuore(N_y_A:N_Htot,1:N_mid+N_epi)=50;
 Cuore(N_y_A:N_Htot,N_x-N_mid-N_epi:N_x)=50;
 Cuore(N_Htot-N_mid-N_epi:N_Htot,:)=50;
 
-%tessuto epi
+%epi
 Cuore(N_y_A:N_Htot,1:N_epi)=65;
 Cuore(N_y_A:N_Htot,N_x-N_epi:N_x)=65;
 Cuore(N_Htot-N_epi:N_Htot,:)=65;
@@ -74,7 +73,7 @@ Cuore(SAN_index_y:SAN_index_y+lunghezza_san,SAN_index:SAN_index+lunghezza_san)=8
 Cuore(N_y_A-N_AVN:N_AVN+N_y_A,:)=100;
 Cuore(N_y_A-N_AVN:N_AVN+N_y_A,AVN-N_atri/2:AVN+N_atri/2)=1;
 
-%fascio di Kent 
+%Kent 
 Cuore(N_y_A-N_AVN:N_y_A+N_AVN,KENT_index:N_L_KENT+KENT_index)=16;
 
 figure
@@ -98,7 +97,7 @@ Dm_AVN=1.171e-3*7/6;
 Dm_endo=1.171e-3*7*2.8;
 Dm_Kent=1.171e-3*7*2.8;
 
-e_endo=0.005; %parametro leggermente modificato per favorire la propagazione
+e_endo=0.005; 
 e_mid=0.003;
 e_epi=0.006;
 e_atrio=0.008;
@@ -124,7 +123,7 @@ for i=1:Nt-1
                     dm=Dm_A;
                     e=e_atrio;
                 elseif Cuore(jy,jx)==16
-                    e=0.0255;  %parametro cambiato
+                    e=0.0255;  
                     dm=Dm_Kent;
                 elseif Cuore(jy,jx)== 1
                     dm=Dm_AVN;
@@ -138,7 +137,7 @@ for i=1:Nt-1
                     e=e_epi;
                 end
                
-                % Calcolo del Laplaciano con metodo dei punti fantasma
+                % laplacian
                 if jx > 1 && Cuore(jy, jx-1) ~= 100 
                     sx = Vm(i, jx-1, jy);
                 else
@@ -170,10 +169,8 @@ for i=1:Nt-1
                 lapv=lapvx+lapvy;
                 Im=dm*lapv;    
 
-                %trascuro il termine aggiuntivo dovuto alla eterogeinità
-                %della diffusività
 
-                %corrente ionica Rogers-McCulloch
+                %Rogers-McCulloch
                 if Cuore(jy,jx)~=80  
                 
                 c1=2.6;
@@ -188,7 +185,7 @@ for i=1:Nt-1
                 Ii=c1*vr*(a-vm)*(1-vm)+c2*u(i,jx,jy)*vr;
                 dv2dt=Im-Ii;
                           
-                %SAN FitzHugh-Nagumo con punto equilibrio instabile
+                %SAN FitzHugh-Nagumo 
                 elseif Cuore(jy,jx)==80
 
                     c1=1.56;
@@ -220,12 +217,6 @@ for i=1:Nt-1
     end
 end
 
-
-% v=VideoWriter('Progettino_rientroAV.mp4','MPEG-4');
-% v.Quality=90;
-% v.FrameRate=30;
-% open(v);
-
 figure;
 for i = 1:10:Nt  
     V = squeeze(Vm(i,:,:))';  
@@ -235,10 +226,9 @@ for i = 1:10:Nt
     title(sprintf('Potenziale Vm a t = %.1f ms', (i-1)*dt));
     axis equal ij
     drawnow;
-    % frame=getframe(gcf);
-    % writeVideo(v,frame)
+
 end
-% close(v)
+
 
 
 
