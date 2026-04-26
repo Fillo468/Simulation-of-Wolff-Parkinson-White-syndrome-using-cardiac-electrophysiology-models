@@ -38,7 +38,7 @@ Inclusion of:
   * Insulating boundary between atria and ventricles
 * Configurable accessory pathways (Bundle of Kent)
 
-![Rappresentation](results/rappresentation.png)
+![Rappresentation](Results/Rappresentation.png)
 
 ---
 
